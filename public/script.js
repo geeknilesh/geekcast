@@ -46,7 +46,7 @@ function connectToNewUser(userId, stream) {
   const call = myPeer.call(userId, stream);
   const video = document.createElement("video");
   call.on("stream", (userVideoStream) => {
-    addVideoStream(video, userVideoStream);
+    addVideoStream(userId, video, userVideoStream);
   });
   call.on("close", () => {
     video.remove();
@@ -55,7 +55,12 @@ function connectToNewUser(userId, stream) {
   peers[userId] = call;
 }
 
-function addVideoStream(video, stream) {
+function addVideoStream(userId, video, stream) {
+  const videoDiv = document.createElement("div");
+  const span = document.createElement("span");
+  span.innerHTML = `<center>${userId}</center>`;
+  videoDiv.appendChild(video);
+  videoDiv.appendChild(span);
   video.srcObject = stream;
   video.addEventListener("loadedmetadata", () => {
     video.play();
