@@ -27,10 +27,11 @@ app.get("/:room", (req, res) => {
 
 io.on("connection", (socket) => {
   socket.on("join-room", (roomId, userId) => {
+    console.log("Someone joined: " + userId);
     socket.join(roomId);
     socket.broadcast.to(roomId).emit("user-connected", userId);
-
     socket.on("disconnect", () => {
+      console.log("xxx User disconnected!!! xxx");
       socket.broadcast.to(roomId).emit("user-disconnected", userId);
     });
   });
