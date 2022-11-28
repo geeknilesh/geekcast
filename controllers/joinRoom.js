@@ -11,7 +11,7 @@ const joinRoom = (req, res) => {
 
 const joinWithRoomId = (req, res) => {
   console.log(req.params.roomId);
-  res.render("room", { roomId: "nilesh" });
+  res.render("room", { roomId: req.params.roomId });
 };
 
 module.exports = {
