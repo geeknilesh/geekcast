@@ -4,6 +4,7 @@ const myPeer = new Peer(undefined, {
   //   host: "/",
   //   port: "3001",
 });
+console.log("hello world!");
 const myVideo = document.createElement("video");
 myVideo.muted = true;
 const peers = {};
@@ -46,7 +47,7 @@ function connectToNewUser(userId, stream) {
   const call = myPeer.call(userId, stream);
   const video = document.createElement("video");
   call.on("stream", (userVideoStream) => {
-    addVideoStream(userId, video, userVideoStream);
+    addVideoStream(video, userVideoStream, userId);
   });
   call.on("close", () => {
     video.remove();
@@ -55,15 +56,21 @@ function connectToNewUser(userId, stream) {
   peers[userId] = call;
 }
 
-function addVideoStream(userId, video, stream) {
-  const videoDiv = document.createElement("div");
+function addVideoStream(video, stream, userId) {
+  const videoDev = document.createElement("div");
   const span = document.createElement("span");
-  span.innerHTML = `<center>${userId}</center>`;
-  videoDiv.appendChild(video);
-  videoDiv.appendChild(span);
+  span.innerText = userId;
+  // videoDev.style.width = "300px";
+  // videoDev.style.height = "300px";
+  // console.log(span);
+  // videoDev.style.backgroundColor = "red";
+  // console.log(video);
+  videoDev.appendChild(video);
+  videoDev.appendChild(span);
   video.srcObject = stream;
   video.addEventListener("loadedmetadata", () => {
     video.play();
   });
-  videoGrid.append(video);
+  // videoGrid.append(video);
+  videoGrid.append(videoDev);
 }
