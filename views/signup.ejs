@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <table>
+        <form id="signUpForm" action="/signup" method="post">
+            <tr>
+                <td><label for="firstname">First Name</label></td>
+                <td><input type="text" name="firstname"></td>
+            </tr>
+            <tr>
+                <td><label for="lastname">Last Name</label></td>
+                <td><input type="text" name="lastname"></td>
+            </tr>
+            <tr>
+                <td><label for="email">E-Mail</label></td>
+                <td><input type="email" name="email"></td>
+            </tr>
+            <tr>
+                <td><label for="password">Password</label></td>
+                <td><input type="password" name="password"></td>
+            </tr>
+            <tr>
+                <td><label for="confirmpassword">Confirm Password</label></td>
+                <td><input type="password" name="confirmpassword"></td>
+            </tr>
+            <tr>
+                <td><button type="submit">Submit</button></td>
+            </tr>
+        </form>
+    </table>
+    <script>
+        const signUpForm = document.getElementById("signUpForm");
+
+
+
+        signUpForm.addEventListener("submit", async (e) => {
+            e.preventDefault();
+
+            const data = new FormData(signUpForm);
+
+            const userData = {
+                firstName: data.get('firstname'),
+                lastName: data.get('lastname'),
+                email: data.get('email'),
+                password: data.get('password'),
+                confirmPassword: data.get('confirmpassword')
+            }
+
+            console.log(userData.firstNam);
+
+            const result = await fetch("/signup", {
+                method: "POST",
+                body: JSON.stringify({ userData: userData }),
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            })
+
+            const response = await result.json();
+
+            if (response.status === true) {
+                window.location.assign("/");
+            } else {
+                console.log("could not signup!");
+            }
+
+        })
+
+    </script>
+</body>
+
+</html>

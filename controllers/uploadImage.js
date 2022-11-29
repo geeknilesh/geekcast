@@ -1,10 +1,3 @@
-/**
- * This file is part of /uploadRoomImage endpoint.
- * It is only for development use only
- * It was purposely made to test the working of uploading image
- *  from POSTMAN locally and over AZURE Storage!
- */
-
 const sharp = require("sharp");
 const fs = require("fs");
 const path = require("path");
@@ -51,14 +44,14 @@ async function uploadToAzureStorage(containerClient, fileName) {
   }
 }
 
-const uploadRoomImage = async (req, res) => {
+const uploadImage = async (file) => {
   fs.access("./uploads", (err) => {
     if (err) fs.mkdirSync("./uploads");
   });
 
-  console.log(req.body);
+  //   console.log(req.body);
 
-  const { buffer } = req.file;
+  const { buffer } = file;
   const timestamp = new Date().toISOString();
   //   const imageName = originalname.split(".");
   const ext = "webp"; //imageName[imageName.length - 1];
@@ -67,7 +60,7 @@ const uploadRoomImage = async (req, res) => {
   const refUrl = path.join(__dirname, "..", "uploads", imageRef); // __dirname + imageRef;
   console.log(refUrl);
   await sharp(buffer).webp({ quality: 20 }).toFile(refUrl);
-  console.log("image uploaded");
+  console.log("Image saved locally!");
 
   //upload to azure storage
   const azureUploadStatus = await uploadToAzureStorage(
@@ -76,18 +69,15 @@ const uploadRoomImage = async (req, res) => {
   );
 
   if (azureUploadStatus.status === true) {
-    res.status(200).json({
-      status: true,
-      url: process.env.BLOB_PRE_URL + imageRef,
-    });
+    return { status: true, url: process.env.BLOB_PRE_URL + imageRef };
   } else {
-    res.status(500).json({
+    return {
       status: false,
       error: azureUploadStatus.response,
-    });
+    };
   }
 };
 
 module.exports = {
-  uploadRoomImage,
+  uploadImage,
 };

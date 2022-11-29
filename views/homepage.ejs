@@ -6,10 +6,102 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <script>
+        const CURR_PAGE = "<%= currentPage %>";
+    </script>
 </head>
 
 <body>
-    This is HomePage!
+    <h1>GeekCast</h1>
+
+    <button id="createRoomBtn">Create Room</button>
+    <button id="joinRoomBtn">Join Room</button>
+    <br> <br>
+    <table id="createRoomTable" hidden>
+
+
+        <form id="createRoomForm" action="/createroom" method="POST" enctype="multipart/form-data">
+            <tr>
+
+                <td><label for="roomName">Room Name</label> </td>
+                <td><input type="text" name="roomName"></td>
+            </tr>
+
+            <tr>
+                <td>
+                    <label for="roomHeading">Room Heading</label>
+                </td>
+                <td> <input type="text" name="roomHeading">
+                </td>
+            </tr>
+
+            <tr>
+                <td> <label for="roomBio">Room Bio</label>
+                </td>
+                <td> <input type="text" name="roomBio">
+                </td>
+            </tr>
+
+            <tr>
+                <td> <label for="roomAdmin">Room Admin</label> </td>
+                <td><input type="text" name="roomAdmin"></td>
+            </tr>
+
+            <tr>
+                <td><label for="img">Room Image</label></td>
+                <td><input type="file" name="img" id="roomImageInput"></td>
+            </tr>
+
+            <tr>
+                <td><input type="submit" value="Submit"></td>
+                <td> <button id="cancelForm">Cancel</button> </td>
+            </tr>
+
+        </form>
+    </table>
+
+    <table id="joinRoomTable" hidden>
+        <form action="/cast">
+            <tr>
+                <td><label for="roomurl">Room URL</label></td>
+                <td><input type="text" name="roomurl"></td>
+            </tr>
+            <tr>
+                <td><input type="submit" value="Join"></td>
+            </tr>
+        </form>
+    </table>
+
+
+    <script>
+        const createRoomBtn = document.getElementById("createRoomBtn");
+        const joinRoomBtn = document.getElementById("joinRoomBtn");
+        const joinRoomTable = document.getElementById("joinRoomTable");
+        const createRoomTable = document.getElementById("createRoomTable");
+        const cancelForm = document.getElementById("cancelForm");
+
+        createRoomBtn.addEventListener("click", (e) => {
+            createRoomBtn.hidden = true;
+            createRoomTable.hidden = false;
+            joinRoomTable.hidden = true;
+        })
+
+        cancelForm.addEventListener("click", (e) => {
+            e.preventDefault();
+            createRoomBtn.hidden = false;
+            createRoomTable.hidden = true;
+        })
+
+        joinRoomBtn.addEventListener("click", (e) => {
+            createRoomBtn.hidden = false;
+            createRoomTable.hidden = true;
+            joinRoomTable.hidden = false;
+        });
+
+
+    </script>
+
 </body>
+
 
 </html>

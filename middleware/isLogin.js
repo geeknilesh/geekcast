@@ -1,9 +1,24 @@
 const jwt = require("jsonwebtoken");
 
 checkLogin = async (req, res, next) => {
-  const auth = req.headers.authorization;
+  // console.log(req.headers.cookie);
 
-  if (!auth) {
+  if (req.headers.cookie === undefined) return res.render("login");
+
+  const cookieArray = req.headers.cookie.split(" ");
+  var userId;
+  let token;
+  if (cookieArray[0].includes("userId")) {
+    userId = decodeURI(cookieArray[0].split("=")[1]);
+    token = decodeURI(cookieArray[1].split("=")[1]);
+  } else {
+    userId = decodeURI(cookieArray[1].split("=")[1]);
+    token = decodeURI(cookieArray[0].split("=")[1]);
+    token = token.slice(0, token.length - 1);
+  }
+  console.log(token);
+
+  if (!token) {
     return res.json({
       status: 401,
       message: {
@@ -14,12 +29,12 @@ checkLogin = async (req, res, next) => {
       },
     });
   } else {
-    const jwt_token = req.headers.authorization.split(" ")[1];
+    // const jwt_token = req.headers.authorization.split(" ")[1];
 
     //jwt token verification
     var truth;
     try {
-      truth = await jwt.verify(jwt_token, process.env.JWT_SECRET);
+      truth = await jwt.verify(token, process.env.JWT_SECRET);
     } catch (err) {
       return res.json(err);
     }
