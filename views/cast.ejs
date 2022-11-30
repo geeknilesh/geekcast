@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script>
+        const ROOM_ID = "<%= roomId %>"
+        var USER_ID = "<%= userId %>"
+        USER_ID = decodeURI(USER_ID);
+
+    </script>
+    <script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <title>Document</title>
+    <style>
+        #video-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, 300px);
+            grid-auto-rows: 300px;
+        }
+
+        video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+    </style>
+</head>
+
+<body>
+    <h2 id="username">
+
+    </h2>
+    <div id="video-grid"></div>
+    <div id="chat">
+        <input id="message" name="message" type="text">
+        <button type="submit" onclick="sendMessage()">Send</button>
+    </div>
+    <ul id="msgList">
+
+    </ul>
+
+    <script>
+        const msgList = document.getElementById("msgList")
+        const username = document.getElementById("username");
+        username.innerHTML = USER_ID;
+        const socket = io("/");
+        const videoGrid = document.getElementById("video-grid");
+        const myPeer = new Peer(USER_ID, {
+            //   host: "/",
+            //   port: "3001",
+        });
+        const myVideo = document.createElement("video");
+        myVideo.muted = true;
+        const peers = [];
+        navigator.mediaDevices
+            .getUserMedia({
+                video: true,
+                audio: true,
+            })
+            .then((stream) => {
+                addVideoStream(myVideo, stream);
+                myPeer.on("call", (call) => {
+                    call.answer(stream);
+                    const video = document.createElement("video");
+                    call.on("stream", (userVideoStream) => {
+                        addVideoStream(video, userVideoStream);
+                    });
+                });
+                socket.on("user-connected", (userId) => {
+                    // user is joining`
+                    console.log(userId);
+
+                    setTimeout(() => {
+                        // user joined
+                        connectToNewUser(userId, stream);
+                    }, 1000);
+
+                });
+                let items = [];
+                socket.on("show-to-room", (message, userId) => {
+                    console.log("message from: " + userId);
+                    items.push([userId, message]);
+                    let listItems = "";
+                    for (let i = 0; i < items.length; i++) {
+                        listItems += "<li>" + items[i][0] + ": " + items[i][1] + "</li>";
+                    }
+                    msgList.innerHTML = listItems;
+                })
+
+            });
+
+        socket.on("user-disconnected", (userId) => {
+            if (peers[userId]) {
+                console.log("user disconnected!!! xxx" + userId);
+                peers[userId].close();
+            }
+        });
+
+        myPeer.on("open", (id) => {
+            socket.emit("join-room", ROOM_ID, id);
+        });
+
+        function connectToNewUser(userId, stream) {
+            const call = myPeer.call(userId, stream);
+            const video = document.createElement("video");
+            call.on("stream", (userVideoStream) => {
+                addVideoStream(video, userVideoStream, userId);
+            });
+            call.on("close", () => {
+                video.remove();
+            });
+
+            peers[userId] = call;
+        }
+
+        function addVideoStream(video, stream, userId) {
+            // const videoDev = document.createElement("div");
+            // const span = document.createElement("span");
+            // span.innerText = userId;
+            // videoDev.style.width = "300px";
+            // videoDev.style.height = "300px";
+            // console.log(span);
+            // videoDev.style.backgroundColor = "red";
+            // console.log(video);
+            // videoDev.appendChild(video);
+            // videoDev.appendChild(span);
+            video.srcObject = stream;
+            video.addEventListener("loadedmetadata", () => {
+                video.play();
+            });
+            // videoGrid.append(video);
+            videoGrid.append(video);
+        }
+
+        function sendMessage() {
+            var msgContent = document.getElementById("message").value;
+
+            socket.emit("send-chat", msgContent, USER_ID);
+        }
+
+    </script>
+
+</body>
+
+</html>

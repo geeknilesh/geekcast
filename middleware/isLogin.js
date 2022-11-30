@@ -3,11 +3,11 @@ const jwt = require("jsonwebtoken");
 checkLogin = async (req, res, next) => {
   // console.log(req.headers.cookie);
 
-  if (req.headers.cookie === undefined) return res.render("login");
+  if (req.headers.cookie === undefined) return res.redirect("/login");
 
   const cookieArray = req.headers.cookie.split(" ");
   var userId;
-  let token;
+  var token;
   if (cookieArray[0].includes("userId")) {
     userId = decodeURI(cookieArray[0].split("=")[1]);
     token = decodeURI(cookieArray[1].split("=")[1]);

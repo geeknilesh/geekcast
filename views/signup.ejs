@@ -54,7 +54,7 @@
                 confirmPassword: data.get('confirmpassword')
             }
 
-            console.log(userData.firstNam);
+            console.log(userData.firstName);
 
             const result = await fetch("/signup", {
                 method: "POST",
@@ -69,7 +69,10 @@
             if (response.status === true) {
                 window.location.assign("/");
             } else {
-                console.log("could not signup!");
+                //const arr = response.error.details;
+                //for (let i = 0; i < arr.length; i++) {
+                console.log(response.error.details[0].message)
+                //}
             }
 
         })

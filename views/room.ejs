@@ -7,6 +7,7 @@
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <script>
     const ROOM_ID = "<%= roomId %>"
+    const USER_ID = ""
   </script>
   <script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"></script>
   <script src="/socket.io/socket.io.js"></script>
@@ -28,19 +29,25 @@
 
 <body>
   <div id="video-grid"></div>
+  <div id="chat">
+    <input id="message" name="message" type="text">
+    <button type="submit" onclick="sendMessage()">Send</button>
+  </div>
+  <ul id="msgList">
 
+  </ul>
 
   <script>
+    const msgList = document.getElementById("msgList")
     const socket = io("/");
     const videoGrid = document.getElementById("video-grid");
     const myPeer = new Peer(undefined, {
       //   host: "/",
       //   port: "3001",
     });
-    console.log("hello world!");
     const myVideo = document.createElement("video");
     myVideo.muted = true;
-    const peers = {};
+    const peers = [];
     navigator.mediaDevices
       .getUserMedia({
         video: true,
@@ -62,7 +69,18 @@
             // user joined
             connectToNewUser(userId, stream);
           }, 1000);
+
         });
+        let items = [];
+        socket.on("show-to-room", (message) => {
+          items.push(message);
+          let listItems = "";
+          for (let i = 0; i < items.length; i++) {
+            listItems += "<li>" + items[i] + "</li>";
+          }
+          msgList.innerHTML = listItems;
+        })
+
       });
 
     socket.on("user-disconnected", (userId) => {
@@ -106,6 +124,12 @@
       });
       // videoGrid.append(video);
       videoGrid.append(video);
+    }
+
+    function sendMessage() {
+      var msgContent = document.getElementById("message").value;
+
+      socket.emit("send-chat", msgContent);
     }
 
   </script>

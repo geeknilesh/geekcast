@@ -30,8 +30,10 @@ const postEmailLogin = async (req, res) => {
           },
           process.env.JWT_SECRET
         );
+        const userId = findUser.firstName + " " + findUser.lastName;
+        console.log(userId);
         res.cookie("token", token);
-        res.cookie("userId", email);
+        res.cookie("userId", userId);
         console.log("cookie sent!");
         return res.status(200).json({
           status: true,

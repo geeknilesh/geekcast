@@ -1,11 +1,18 @@
 const userModel = require("../models/userModel");
 const jwt = require("jsonwebtoken");
 const argon2 = require("argon2");
+const joiSchema = require("../models/joiSchema");
 
 const signup = async (req, res) => {
   const userDetails = req.body.userData;
   console.log(req.body);
   const password = req.body.userData.password;
+
+  const validation = joiSchema.validate(req.body.userData);
+  console.log(validation);
+  if (validation.error) {
+    return res.json({ status: false, error: validation.error });
+  }
 
   try {
     const hash = await argon2.hash(password);

@@ -12,7 +12,10 @@ const { signup, getSignUp } = require("../controllers/signup");
 const { createRoom } = require("../controllers/createRoom");
 const { uploadRoomImage } = require("../controllers/uploadRoomImage");
 const { joinRoom, joinWithRoomId } = require("../controllers/joinRoom");
-const { connectRoom } = require("../controllers/connectRoom");
+const {
+  connectRoom,
+  connectRoomWithUrl,
+} = require("../controllers/connectRoom");
 
 router.route("/").get(checkLogin, homepageData).post(checkLogin, roomData);
 
@@ -23,7 +26,8 @@ router.route("/signup").get(getSignUp).post(signup);
 router.route("/room").get(joinRoom);
 router.route("/room/:roomId").get(joinWithRoomId);
 
-router.route("/cast").get(connectRoom);
+router.route("/cast").get(checkLogin, connectRoom);
+router.route("/cast/:roomId").get(checkLogin, connectRoomWithUrl);
 
 router.route("/createroom").post(checkLogin, upload.single("img"), createRoom);
 

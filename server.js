@@ -9,7 +9,7 @@ require("./helpers/init_mongo.js");
 
 // const server = require("http").Server(app);
 
-// app.use(express.urlencoded({ ext ended: true }));
+app.use(express.urlencoded({ extended: true }));
 
 const sslServer = https.createServer(
   {
@@ -34,6 +34,9 @@ io.on("connection", (socket) => {
     // saveRoomDetails(roomId);
     socket.join(roomId);
     socket.broadcast.to(roomId).emit("user-connected", userId);
+    socket.on("send-chat", (message, userId) => {
+      io.to(roomId).emit("show-to-room", message, userId);
+    });
     socket.on("disconnect", () => {
       console.log("xxx User disconnected!!! xxx");
       socket.broadcast.to(roomId).emit("user-disconnected", userId);
