@@ -4,12 +4,14 @@ const https = require("https");
 const path = require("path");
 const fs = require("fs");
 require("dotenv").config();
+const cookieParser = require("cookie-parser");
 const homeRoute = require("./routes/homeRoute");
 require("./helpers/init_mongo.js");
-
+require("./helpers/cron_jobs");
 // const server = require("http").Server(app);
 
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: false }));
+app.use(cookieParser());
 
 const sslServer = https.createServer(
   {

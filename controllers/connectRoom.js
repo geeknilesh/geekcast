@@ -25,6 +25,7 @@ const connectRoom = async (req, res) => {
       return res.send("Room not found! Please Create one!");
     } else {
       //   return res.render("cast", { roomId: roomUrl, userId });
+      roomModel.connect;
       res.redirect("/cast/" + roomUrl);
     }
   } else {

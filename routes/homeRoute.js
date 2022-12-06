@@ -29,7 +29,7 @@ router.route("/room/:roomId").get(joinWithRoomId);
 router.route("/cast").get(checkLogin, connectRoom);
 router.route("/cast/:roomId").get(checkLogin, connectRoomWithUrl);
 
-router.route("/createroom").post(checkLogin, upload.single("img"), createRoom);
+router.route("/createroom").post(upload.single("img"), createRoom);
 
 router
   .route("/uploadRoomImage")

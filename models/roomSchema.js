@@ -8,6 +8,8 @@ const roomSchema = new mongoose.Schema({
   roomHeading: { type: String, required: true },
   roomImage: { type: String },
   roomBio: { type: String },
+  createdAt: { type: Date, required: true },
+  lastActive: { type: Date },
 });
 
 module.exports = roomSchema;

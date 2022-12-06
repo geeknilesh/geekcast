@@ -30,9 +30,11 @@
 </head>
 
 <body>
-    <h2 id="username">
+    <h2 id="username"></h2>
 
-    </h2>
+    <button id="muteVideo" onclick="muteVideo()">Mute Video </button>
+    <button id="muteAudio" onclick="muteAudio()">Mute Audio </button>
+
     <div id="video-grid"></div>
     <div id="chat">
         <input id="message" name="message" type="text">
@@ -43,8 +45,11 @@
     </ul>
 
     <script>
-        const msgList = document.getElementById("msgList")
+        const msgList = document.getElementById("msgList");
         const username = document.getElementById("username");
+        const muteA = document.getElementById("muteAudio");
+        const muteV = document.getElementById("muteVideo");
+
         username.innerHTML = USER_ID;
         const socket = io("/");
         const videoGrid = document.getElementById("video-grid");
@@ -55,15 +60,20 @@
         const myVideo = document.createElement("video");
         myVideo.muted = true;
         const peers = [];
+        var localeStream;
+        let isAudio = true;
+        let isVideo = true;
+
         navigator.mediaDevices
             .getUserMedia({
                 video: true,
                 audio: true,
             })
             .then((stream) => {
-                addVideoStream(myVideo, stream);
+                localStream = stream;
+                addVideoStream(myVideo, localStream);
                 myPeer.on("call", (call) => {
-                    call.answer(stream);
+                    call.answer(localStream);
                     const video = document.createElement("video");
                     call.on("stream", (userVideoStream) => {
                         addVideoStream(video, userVideoStream);
@@ -75,7 +85,7 @@
 
                     setTimeout(() => {
                         // user joined
-                        connectToNewUser(userId, stream);
+                        connectToNewUser(userId, localStream);
                     }, 1000);
 
                 });
@@ -139,6 +149,32 @@
             var msgContent = document.getElementById("message").value;
 
             socket.emit("send-chat", msgContent, USER_ID);
+        }
+
+
+        function muteAudio() {
+            isAudio = !isAudio;
+            if (isAudio === true) {
+                muteA.style.color = "black";
+                muteA.innerHTML = "Mute Audio";
+            }
+            else {
+                muteA.innerHTML = "Muted!"
+                muteA.style.color = "red";
+            }
+            localStream.getAudioTracks()[0].enabled = isAudio;
+        }
+        function muteVideo() {
+            isVideo = !isVideo;
+            if (isVideo === true) {
+                muteV.style.color = "black";
+                muteV.innerHTML = "Mute Audio";
+            }
+            else {
+                muteV.innerHTML = "Muted!"
+                muteV.style.color = "red";
+            }
+            localStream.getVideoTracks()[0].enabled = isVideo;
         }
 
     </script>

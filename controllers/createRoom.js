@@ -23,11 +23,14 @@ const createRoom = async (req, res) => {
       .sort({ field: "asc", _id: -1 })
       .limit(1); //({ sort: { created_at: 1 } });
     // console.log("Last Room Created: " + lastRoom);
-    console.log(lastRoom);
+    // console.log(lastRoom);
+
     let roomId;
     if (lastRoom != null) {
       roomId = lastRoom.roomId + 1 || 1;
     } else roomId = 1;
+
+    const createdAt = new Date().toISOString();
 
     const roomDetails = {
       roomId,
@@ -37,10 +40,12 @@ const createRoom = async (req, res) => {
       roomHeading,
       roomImage,
       roomBio,
+      createdAt,
+      lastActive: createdAt,
     };
     const response = await roomModel.create(roomDetails);
     console.log("Room Created!! " + response);
-    return res.json(response.roomUrl);
+    return res.json({ status: true, url: response.roomUrl });
   } catch (err) {
     console.log("Error creating room! " + err.message);
     return res.status(500).json({

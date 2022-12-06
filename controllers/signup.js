@@ -11,7 +11,10 @@ const signup = async (req, res) => {
   const validation = joiSchema.validate(req.body.userData);
   console.log(validation);
   if (validation.error) {
-    return res.json({ status: false, error: validation.error });
+    return res.json({
+      status: false,
+      error: validation.error.details[0].message,
+    });
   }
 
   try {
