@@ -16,6 +16,7 @@
 
     <button id="createRoomBtn">Create Room</button>
     <button id="joinRoomBtn">Join Room</button>
+    <button id="listRoomBtn">List Rooms</button>
     <br> <br>
     <table id="createRoomTable" hidden>
 
@@ -72,6 +73,12 @@
         </form>
     </table>
 
+    <div id="roomDiv" hidden>
+        <ul id="listRoomId">
+
+        </ul>
+    </div>
+
 
     <script>
         const createRoomBtn = document.getElementById("createRoomBtn");
@@ -79,7 +86,11 @@
         const joinRoomTable = document.getElementById("joinRoomTable");
         const createRoomTable = document.getElementById("createRoomTable");
         const cancelForm = document.getElementById("cancelForm");
+        const listRoomBtn = document.getElementById("listRoomBtn");
+        const roomDiv = document.getElementById("roomDiv");
+        const listRoomId = document.getElementById("listRoomId");
 
+        var roomArr = [];
         createRoomBtn.addEventListener("click", (e) => {
             createRoomBtn.hidden = true;
             createRoomTable.hidden = false;
@@ -98,6 +109,29 @@
             joinRoomTable.hidden = false;
         });
 
+        listRoomBtn.addEventListener("click", async (e) => {
+            roomDiv.hidden = false;
+            const roomData = await fetch("/listRooms", {
+                method: "POST",
+                headers: {
+                    "content-type": "application/json; charset=utf-8",
+                }
+            })
+            const data = await roomData.json();
+            console.log(data);
+            listRoomId.innerHTML = '';
+            data.rooms.forEach(insertData);
+
+        })
+
+        function insertData(element) {
+            roomArr.push(element.roomUrl);
+            let li = document.createElement("li");
+            li.innerHTML = element.roomUrl;
+            li.setAttribute("id", element.roomUrl);
+            listRoomId.appendChild(li);
+        }
+        console.log(roomArr);
 
     </script>
 

@@ -7,18 +7,31 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <script>
         const ROOM_ID = "<%= roomId %>"
-        var USER_ID = "<%= userId %>"
-        USER_ID = decodeURI(USER_ID);
+        var USER_ID = "<%= userId %>";
+        // USER_ID = decodeURI(USER_ID);
+
+        var ROOM_DATA = '<%= roomData %>';
+        var temp = new DOMParser().parseFromString(ROOM_DATA, "text/html").body.innerHTML;
+        var ROOM_DATA = JSON.parse(temp);
+        console.log(ROOM_DATA);
 
     </script>
     <script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"></script>
     <script src="/socket.io/socket.io.js"></script>
     <title>Document</title>
     <style>
+        main {
+            width: 100%;
+            display: flex;
+            flex-direction: row;
+        }
+
         #video-grid {
+            width: 80% !important;
             display: grid;
             grid-template-columns: repeat(auto-fill, 300px);
             grid-auto-rows: 300px;
+
         }
 
         video {
@@ -26,25 +39,58 @@
             height: 100%;
             object-fit: cover;
         }
+
+        #chatBox {
+            border: 2px solid black;
+            border-color: black;
+            width: 20%;
+            height: 500px;
+        }
+
+        #muteBtn {
+            padding-bottom: 10px;
+        }
+
+        #msgList {
+            height: 450px;
+            overflow-y: scroll;
+        }
     </style>
 </head>
 
 <body>
+    <h1 id="roomName"></h1>
+    <h3 id="roomHeading"></h3>
+    <div id="roomImgDiv"><img id="roomImg" src="" alt="Room Image"></div>
+
     <h2 id="username"></h2>
 
-    <button id="muteVideo" onclick="muteVideo()">Mute Video </button>
-    <button id="muteAudio" onclick="muteAudio()">Mute Audio </button>
-
-    <div id="video-grid"></div>
-    <div id="chat">
-        <input id="message" name="message" type="text">
-        <button type="submit" onclick="sendMessage()">Send</button>
+    <div id="muteBtn">
+        <button id="muteVideo" onclick="muteVideo()">Mute Video </button>
+        <button id="muteAudio" onclick="muteAudio()">Mute Audio </button>
     </div>
-    <ul id="msgList">
+    <main>
+        <div id="video-grid"></div>
 
-    </ul>
+        <div id="chatBox">
+            <div id="chat">
+                <input id="message" name="message" type="text">
+                <button type="submit" onclick="sendMessage()">Send</button>
+            </div>
+
+            <ul id="msgList">
+
+            </ul>
+        </div>
+    </main>
+
+
 
     <script>
+        document.getElementById("roomName").innerHTML = ROOM_DATA.roomName;
+        document.getElementById("roomHeading").innerHTML = ROOM_DATA.roomHeading;
+        document.getElementById("roomImg").setAttribute("src", ROOM_DATA.roomImag);
+
         const msgList = document.getElementById("msgList");
         const username = document.getElementById("username");
         const muteA = document.getElementById("muteAudio");
@@ -71,12 +117,13 @@
             })
             .then((stream) => {
                 localStream = stream;
-                addVideoStream(myVideo, localStream);
+                addVideoStream(myVideo, localStream, USER_ID);
                 myPeer.on("call", (call) => {
-                    call.answer(localStream);
+                    call.answer(localStream, USER_ID);
                     const video = document.createElement("video");
-                    call.on("stream", (userVideoStream) => {
-                        addVideoStream(video, userVideoStream);
+                    call.on("stream", (userVideoStream, userId) => {
+                        console.log("logging userId in own video!!: " + userId);
+                        addVideoStream(video, userVideoStream, userId);
                     });
                 });
                 socket.on("user-connected", (userId) => {
@@ -110,6 +157,8 @@
         });
 
         myPeer.on("open", (id) => {
+            console.log("this is from myPeer on- open event");
+            console.log(id);
             socket.emit("join-room", ROOM_ID, id);
         });
 
@@ -127,22 +176,24 @@
         }
 
         function addVideoStream(video, stream, userId) {
-            // const videoDev = document.createElement("div");
-            // const span = document.createElement("span");
-            // span.innerText = userId;
+            const videoDev = document.createElement("div");
+            const span = document.createElement("span");
+            span.innerText = userId;
+            span.style.height = "10px";
             // videoDev.style.width = "300px";
-            // videoDev.style.height = "300px";
+            videoDev.style.height = "320px";
             // console.log(span);
-            // videoDev.style.backgroundColor = "red";
+            videoDev.style.backgroundColor = "red";
+            videoDev.setAttribute("id", userId);
             // console.log(video);
-            // videoDev.appendChild(video);
-            // videoDev.appendChild(span);
+            videoDev.appendChild(video);
+            videoDev.appendChild(span);
             video.srcObject = stream;
             video.addEventListener("loadedmetadata", () => {
                 video.play();
             });
             // videoGrid.append(video);
-            videoGrid.append(video);
+            videoGrid.append(videoDev);
         }
 
         function sendMessage() {

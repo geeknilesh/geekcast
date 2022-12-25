@@ -1,4 +1,5 @@
 const roomModel = require("../models/roomModel");
+//Need to fix: 2 database calls if room found. One is for checking and another for sending to client.
 
 const connectRoom = async (req, res) => {
   const cookieArray = req.headers.cookie.split(" ");
@@ -41,7 +42,7 @@ const connectRoom = async (req, res) => {
   }
 };
 
-const connectRoomWithUrl = (req, res) => {
+const connectRoomWithUrl = async (req, res) => {
   const cookieArray = req.headers.cookie.split(" ");
 
   var userId;
@@ -53,7 +54,11 @@ const connectRoomWithUrl = (req, res) => {
     userId = decodeURI(cookieArray[1].split("=")[1]);
   }
   const roomId = req.params.roomId;
-  res.render("cast", { roomId, userId });
+  const room = await roomModel.findOne({ roomUrl: roomId });
+  const roomData = JSON.stringify(room);
+  console.log(roomData);
+
+  res.render("cast", { roomId, userId, roomData });
 };
 
 module.exports = {

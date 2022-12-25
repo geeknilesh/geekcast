@@ -16,6 +16,7 @@ const {
   connectRoom,
   connectRoomWithUrl,
 } = require("../controllers/connectRoom");
+const { getRooms } = require("../controllers/getRooms");
 
 router.route("/").get(checkLogin, homepageData).post(checkLogin, roomData);
 
@@ -30,6 +31,8 @@ router.route("/cast").get(checkLogin, connectRoom);
 router.route("/cast/:roomId").get(checkLogin, connectRoomWithUrl);
 
 router.route("/createroom").post(upload.single("img"), createRoom);
+
+router.route("/listrooms").post(getRooms);
 
 router
   .route("/uploadRoomImage")
